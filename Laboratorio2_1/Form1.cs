@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Linq.Expressions;
 
 namespace Laboratorio2_1
 {
@@ -84,27 +83,12 @@ namespace Laboratorio2_1
 
                             // Convierte el coeficienteStr a double
                             double coeficiente = Convert.ToDouble(coeficienteStr);
-
-                            // Verifica si el término contiene un signo negativo
-                            if (termino.StartsWith("-"))
-                            {
-                                coeficiente = -coeficiente;
-                            }
-
-                            m += coeficiente;
+                            m = coeficiente;
                         }
                         else
                         {
                             // El término no contiene "x", por lo que es el término constante (b)
-                            double constante = Convert.ToDouble(termino);
-
-                            // Verifica si el término anterior era negativo y aplica el signo adecuado
-                            if (terminos.Length > 1 && terminos[Array.IndexOf(terminos, termino) - 1].StartsWith("-"))
-                            {
-                                constante = -constante;
-                            }
-
-                            b += constante;
+                            b += Convert.ToDouble(termino);
                         }
                     }
 
@@ -238,45 +222,49 @@ namespace Laboratorio2_1
             double m2;
             double b2;
 
-            // Obtener coeficientes
+            // Se extraen los coeficientes del string y se calcula la intersección si es que la tienen o su paralelismo o perpendicularidad.
             if (obtenerCoeficientes(ecuacion1, out m1, out b1) && obtenerCoeficientes(ecuacion2, out m2, out b2))
             {
-                // Verificar si las pendientes son perpendiculares
-                if (Math.Abs(m1 * m2 + 1) < double.Epsilon)
+                double xInterseccion = (b2 - b1) / (m1 - m2);
+                double yInterseccion = m1 * xInterseccion + b1;
+
+                labelResultado.Text = $"Intersección en ({xInterseccion} , {yInterseccion})";
+
+                bool m1Negativo = m1 < 0;
+                bool m2Negativo = m2 < 0;
+                bool b1Negativo = b1 < 0;
+                bool b2Negativo = b2 < 0;
+
+                // Verifica si las ecuaciones son coincidentes
+                if (Math.Abs(m1 - m2) < double.Epsilon && Math.Abs(b1 - b2) < double.Epsilon)
                 {
-                    if (Math.Abs(m1) < double.Epsilon && Math.Abs(m2) < double.Epsilon)
+                    labelResultado.Text = "Las rectas son coincidentes";
+                }
+                else if (Math.Abs(m1 - m2) < double.Epsilon)
+                {
+                    if (m1Negativo && m2Negativo)
                     {
-                        // Ambas pendientes son cero, las rectas son coincidentes
-                        labelResultado.Text = "Las rectas son coincidentes.";
-                    }
-                    else if (Math.Abs(m1) < double.Epsilon || Math.Abs(m2) < double.Epsilon)
-                    {
-                        // Al menos una de las pendientes es cero, las rectas son perpendiculares en el eje Y
-                        double xInterseccion = Math.Abs(m1) < double.Epsilon ? -b1 / m2 : -b2 / m1;
-                        labelResultado.Text = $"Las rectas son perpendiculares en ({xInterseccion}, 0).";
+                        labelResultado.Text = $"Las rectas son paralelas en ({xInterseccion} , {yInterseccion}) con coeficientes negativos.";
                     }
                     else
                     {
-                        // Pendientes no nulas y no perpendiculares, las rectas son paralelas
-                        labelResultado.Text = "Las rectas son paralelas y no tienen intersección.";
+                        labelResultado.Text = "Las rectas son paralelas";
+                    }
+                }
+                else if (Math.Abs(m1 * m2 + 1) < double.Epsilon)
+                {
+                    if (m1Negativo && m2Negativo)
+                    {
+                        labelResultado.Text = $"Las rectas son perpendiculares en ({xInterseccion} , {yInterseccion}) con coeficientes negativos.";
+                    }
+                    else
+                    {
+                        labelResultado.Text = "Las rectas son perpendiculares";
                     }
                 }
                 else
                 {
-                    if (Math.Abs(m1) == Math.Abs(m2))
-                    {
-                        double xInterseccion = (b2 - b1)/Math.Abs(m1) ;
-                        double yInterseccion = m1 * xInterseccion + b1;
-                        labelResultado.Text = $"Son perpendiculares " +
-                            $"con intersección en ({xInterseccion}, {yInterseccion}).";
-                    }
-                    else
-                    {
-                        // Las rectas no son perpendiculares, calcula la intersección como antes
-                        double xInterseccion = (b2 - b1) / (m1 - m2);
-                        double yInterseccion = m1 * xInterseccion + b1;
-                        labelResultado.Text = $"Intersección en ({xInterseccion}, {yInterseccion}).";
-                    }
+                    labelResultado.Text = "Las rectas no son paralelas ni perpendiculares";
                 }
 
                 // Invalidar el PictureBox para forzar la actualización de la gráfica.

@@ -1,0 +1,5 @@
+﻿Operación Compilar iniciada..
+1>------ Operación Compilar iniciada: Proyecto: Laboratorio2_1, configuración: Debug Any CPU ------
+1>  Laboratorio2_1 -> C:\Users\andre\source\repos\Laboratorio2_1\Lab_2\Laboratorio2_1\bin\Debug\Laboratorio2_1.exe
+========== Compilación: 1 correcto, 0 erróneo, 0 actualizado, 0 omitido ==========
+========= Compilar se inició en 1:02 a. m. y tomó 00,563 segundos ==========
